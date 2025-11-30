@@ -60,7 +60,7 @@ export const VibesGenerator = () => {
         ></span>
         <span
           style={{ backgroundColor: `${color}` }}
-          className="bg-linear-to-b from-[#242424] transition-colors will-change-auto duration-300 linear inline-flex to-transparent animate-pulse! brightness-140 size-full rounded-full"
+          className="bg-linear-to-b from-[#242424] transition-all will-change-auto duration-300 linear inline-flex to-transparent animate-pulse! brightness-140 size-full rounded-full"
         ></span>
       </div>
 
@@ -77,7 +77,7 @@ export const VibesGenerator = () => {
             damping: 40,
             mass: 1.2,
           }}
-          className="text-3xl font-extrabold transform-gpu"
+          className="text-3xl font-extrabold text-center transform-gpu"
         >
           {punch}
         </motion.div>
