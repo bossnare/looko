@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 export function TopBar() {
   const base =
     'px-6 md:px-4 font-medium py-3 md:py-2 rounded-full transition-colors will-change-auto duration-300';
-  const active = 'text-blue-500 font-black bg-blue-600/20';
+  const active = 'text-[#247BA0] font-black bg-[#247BA0]/10';
   const inactive = 'text-gray-300 hover:bg-gray-700';
 
   return (
