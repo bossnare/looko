@@ -32,7 +32,7 @@ export function SocketTester() {
           <p className="md:text-xs">Start to chat.</p>
           <ChatTextIcon className="size-5" />
         </div>
-        <div className="absolute bottom-0 left-0 flex w-full h-16 gap-2 p-2 md:h-12 bg-linear-to-b from-transparent to-black/50">
+        <div className="fixed inset-x-0 bottom-0 left-0 flex w-full h-16 gap-2 p-2 md:absolute md:h-12 bg-linear-to-b from-transparent to-black/50">
           <input
             placeholder="Type something on your mind..."
             type="text"
