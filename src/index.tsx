@@ -1,5 +1,8 @@
 import { serve } from 'bun';
 import index from './index.html';
+import { ServerWebSocket } from 'bun';
+
+const clients = new Set<ServerWebSocket>();
 
 const server = serve({
   port: 3000,
@@ -41,13 +44,19 @@ const server = serve({
     return new Response('Hello World');
   },
   websocket: {
-    open(ws) {
+    open(ws: ServerWebSocket) {
+      clients.add(ws);
       console.log('Client connected');
-      ws.send('Welcome Patron!');
     },
     message(ws, msg) {
-      console.log('Received:', msg);
-      ws.send('Server echo: ' + msg);
+      for (const client of clients) {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(msg);
+        }
+      }
+    },
+    close(ws: ServerWebSocket) {
+      clients.delete(ws);
     },
   },
 

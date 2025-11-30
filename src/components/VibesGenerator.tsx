@@ -1,37 +1,11 @@
+import { colors, punchs } from '@/pkg.ts/some';
+import { getRandom } from '@/utils/get-random';
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect } from 'react';
 
 export const VibesGenerator = () => {
   const [color, setColor] = useState<string | null>(null);
   const [punch, setPunch] = useState<string | null>(null);
-
-  const colors = [
-    '#84DCC6',
-    '#D63DFF',
-    '#ACD7EC',
-    '#8B95C9',
-    '#478978',
-    '#140D4F',
-    '#7765E3',
-    '#EDD3C4',
-    '#3B60E4',
-  ];
-  const punchs = [
-    'Allez vas-y !',
-    "Oh lala, j'adore ça !",
-    'Spectaculaire !',
-    'Tu es un frère de Chuck Norris.',
-    'Ta couleur preférée.',
-    "Bonne année n'est pas loin !",
-    'Pétit frère de Zuckerberg.',
-    'Bon voyage !',
-    'Bonne chance !',
-    "I'm good !",
-  ];
-
-  const getRandom = (arr: string[]) => {
-    return arr[Math.floor(Math.random() * arr.length)];
-  };
 
   const textVariants = {
     initial: { opacity: 0, x: -20 },
@@ -60,7 +34,7 @@ export const VibesGenerator = () => {
         ></span>
         <span
           style={{ backgroundColor: `${color}` }}
-          className="bg-linear-to-b from-[#242424] transition-all will-change-auto duration-300 linear inline-flex to-transparent animate-pulse! brightness-140 size-full rounded-full"
+          className="bg-linear-to-b from-[#242424] transition-all will-change-auto duration-300 linear inline-flex to-transparent animate-pulse! brightness-200 size-full rounded-full"
         ></span>
       </div>
 
