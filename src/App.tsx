@@ -5,7 +5,7 @@ import { AppRoutes } from './Routes';
 
 export function App() {
   return (
-    <div className="bg-linear-to-b from-transparent to-[#242424] min-h-screen">
+    <div className="bg-linear-to-b from-transparent to-[#242424] min-h-screen relative">
       <TopBar />
       <AppRoutes />
     </div>

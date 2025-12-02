@@ -1,8 +1,16 @@
-import { serve } from 'bun';
+import { serve, ServerWebSocket } from 'bun';
+import { Database } from 'bun:sqlite';
 import index from './index.html';
-import { ServerWebSocket } from 'bun';
+import type { Message } from './types/chat.type';
 
 const clients = new Set<ServerWebSocket>();
+const db = new Database('chat.db'); // create db
+
+// create tables
+db.run('CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY, username TEXT)');
+db.run(
+  'CREATE TABLE IF NOT EXISTS messages(id TEXT PRIMARY KEY, content TEXT, sentAt INTEGER, userId TEXT, username TEXT)'
+);
 
 const server = serve({
   port: 3000,
@@ -28,32 +36,39 @@ const server = serve({
     '/api/hello/:name': async (req) => {
       const name = req.params.name;
       return Response.json({
-        message: `Hello, ${name}!`,
+        message: `Hello, ${name}!.`,
       });
     },
   },
-  // for websocket
+  // for socket
   fetch(req, server) {
-    // const url = new URL(req.url);
-    // if (url.pathname === '/chat') {
     const upgraded = server.upgrade(req);
     if (!upgraded) {
       return new Response('Upgrade failed', { status: 400 });
     }
-    // }
+
     return new Response('Hello World');
   },
   websocket: {
     open(ws: ServerWebSocket) {
       clients.add(ws);
-      console.log('Client connected');
+      console.log('Client connected.');
     },
-    message(ws, msg) {
+    message(ws, raw) {
+      const text =
+        typeof raw === 'string' ? raw : new TextDecoder().decode(raw);
+      const msg = JSON.parse(text) as Message;
+
       for (const client of clients) {
         if (client.readyState === WebSocket.OPEN) {
-          client.send(msg);
+          client.send(raw);
         }
       }
+
+      // db.run(
+      //   'INSERT INTO messages (id, content, sentAt, userId, username) (?, ?, ?, ?, ?)',
+      //   [msg.id, msg.content, msg.sentAt, msg.user.id, msg.user.username]
+      // );
     },
     close(ws: ServerWebSocket) {
       clients.delete(ws);
@@ -68,3 +83,5 @@ const server = serve({
     console: true,
   },
 });
+
+console.log(`Server started on http://localhost:${server.port}`);
