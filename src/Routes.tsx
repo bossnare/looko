@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
-import { VibesGenerator } from './components/VibesGenerator';
-import { SocketTester } from './SocketTester';
 import { NotFound } from './components/NotFound';
+import { SocketTester } from './components/SocketTester';
+import { VibesGenerator } from './components/VibesGenerator';
 
 export function AppRoutes() {
   return (

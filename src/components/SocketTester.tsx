@@ -1,15 +1,17 @@
+import { useChat } from '@/hooks/use-chat';
+import { useUser } from '@/hooks/use-users';
 import {
   ChatTextIcon,
   PaperPlaneTiltIcon,
   UserIcon,
 } from '@phosphor-icons/react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useState, type FormEvent } from 'react';
-import logo from './logo.svg';
-import { colors } from './pkg.ts/some';
-import { getRandom } from './utils/get-random';
-import type { Message, User } from './types/chat.type';
-import { fakeUsers } from './data/fake';
+import { type FormEvent } from 'react';
+import { fakeUsers } from '../data/fake';
+import { colors } from '@/pkg.ts/some';
+import type { Message } from '@/types/chat.type';
+import { getRandom } from '@/utils/get-random';
+import logo from '../logo.svg';
 
 const color = getRandom(colors);
 const tabId = crypto.randomUUID();
@@ -31,37 +33,10 @@ const dateFormat = (date: number) => {
   return d.toLocaleString('fr-FR').split(' ')[1];
 };
 
-export const useChat = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [ws, setWs] = useState<WebSocket | null>(null);
-
-  useEffect(() => {
-    const socket = new WebSocket('ws://localhost:3000');
-    setWs(socket);
-
-    socket.onmessage = (e) => {
-      const msg = JSON.parse(e.data);
-      setMessages((prev) => [...prev, msg]);
-    };
-
-    return () => socket.close();
-  }, []);
-
-  const send = (msg: Message) => {
-    if (ws?.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(msg));
-    }
-  };
-
-  return { messages, send };
-};
-
 export function SocketTester() {
   const { messages, send } = useChat();
   const nullMsg = messages.length < 1;
-  const testers = sessionStorage.getItem(`testers_${tabId}`);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  console.log(testers);
+  const { setUser, selectedUser, otherUser } = useUser(tabId, fakeUsers);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -93,20 +68,15 @@ export function SocketTester() {
 
     if (!tester) return;
 
-    const selectedTester = fakeUsers.filter((u) => u.id === tester)[0];
-    sessionStorage.setItem(
-      `testers_${tabId}`,
-      JSON.stringify({ selectedTester })
-    );
-    setSelectedUser(selectedTester);
-
+    // store the selected user and select other
+    setUser(tester);
     form.reset();
   };
 
   console.log(messages);
 
   return (
-    <div className="md:flex md:gap-8 justify-center max-h-screen py-4">
+    <div className="justify-center max-h-screen py-4 md:flex md:gap-8">
       <div className="w-full h-[calc(100dvh-56px)] md:w-64 md:h-120 bg-[#1a1a1a] rounded-3xl rounded-b-none md:rounded-xl p-4 relative overflow-hidden">
         <AnimatePresence mode="wait">
           {nullMsg ? (
@@ -156,11 +126,22 @@ export function SocketTester() {
                 <img src={logo} alt="Bun" className="size-full" />
               </div>
               <div className="-space-y-1">
-                <h3 className="text-lg font-bold md:text-sm p-0">
-                  WebSocket Tester
+                <h3 className="p-0 text-lg font-bold md:text-sm">
+                  {otherUser?.username || 'WebSocket Tester'}
                 </h3>
-                <p className="text-gray-400 text-xs">online</p>
+                <p className="text-xs text-gray-400">online</p>
               </div>
+
+              <select
+                onChange={(e) => {
+                  setUser(e.target.value);
+                }}
+                className="ml-auto border rounded-full size-6"
+              >
+                {fakeUsers.map((u) => (
+                  <option value={u.id}>{u.username}</option>
+                ))}{' '}
+              </select>
             </motion.div>
           )}
         </AnimatePresence>
@@ -192,7 +173,7 @@ export function SocketTester() {
                 className={`${
                   selectedUser?.id === msg?.user?.id
                     ? 'bg-blue-600'
-                    : 'bg-gray-600'
+                    : 'bg-[#242424]'
                 } px-2 relative py-2 truncate line-clamp-3 min-h-8 rounded-lg md:text-xs`}
               >
                 {msg?.content || 'Message deleted by daemon'}
@@ -245,7 +226,7 @@ export function SocketTester() {
               <div className="w-15 shrink-0">
                 <button
                   type="submit"
-                  className="flex items-center justify-center bg-blue-600 rounded-sm md:text-xs shadow-md size-full shadow-blue-500/10"
+                  className="flex items-center justify-center bg-blue-600 rounded-sm shadow-md md:text-xs size-full shadow-blue-500/10"
                 >
                   Select
                 </button>
