@@ -1,10 +1,18 @@
-import { serve, ServerWebSocket } from 'bun';
+import { createOpenAI, openai } from '@ai-sdk/openai';
+import { streamText } from 'ai';
+import { serve, type ServerWebSocket } from 'bun';
 import { Database } from 'bun:sqlite';
 import index from './index.html';
 import type { Message } from './types/chat.type';
 
 const clients = new Set<ServerWebSocket>();
-const db = new Database('chat.db'); // create db
+const db = new Database('chat.sqlite'); // create db
+const apiKey = Bun.env.AI_GATEWAY_API_KEY;
+
+const openaiGateway = createOpenAI({
+  baseURL: 'https://api.openai.com/v1/responses',
+  apiKey: apiKey,
+});
 
 // create tables
 db.run('CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY, username TEXT)');
@@ -38,6 +46,25 @@ const server = serve({
       return Response.json({
         message: `Hello, ${name}!.`,
       });
+    },
+
+    '/api/chat': {
+      async POST(req) {
+        const body = await req.json();
+        console.log(body);
+
+        const result = streamText({
+          model: openaiGateway('gpt-5-chat-latest'),
+          messages: [
+            {
+              role: 'user',
+              content: body.message,
+            },
+          ],
+        });
+
+        return result.toTextStreamResponse();
+      },
     },
   },
   // for socket
@@ -84,4 +111,7 @@ const server = serve({
   },
 });
 
-console.log(`Server started on http://localhost:${server.port}`);
+console.log(
+  `Server started on http://localhost:${server.port}`,
+  '- Powered by Bun'
+);

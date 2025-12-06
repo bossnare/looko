@@ -11,32 +11,21 @@ import { fakeUsers } from '../data/fake';
 import { colors } from '@/pkg.ts/some';
 import type { Message } from '@/types/chat.type';
 import { getRandom } from '@/utils/get-random';
-import logo from '../logo.svg';
+import logo from '@/logo.svg';
+import reactLogo from '@/react.svg';
+import { boxVariants, messageVariants } from '@/motions/variants.motion';
+import { dateFormat } from '@/utils/date-format';
 
 const color = getRandom(colors);
+const profilPic = getRandom([logo, reactLogo]);
 const tabId = crypto.randomUUID();
-
-const boxVariants = {
-  initial: { opacity: 0, y: -10 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 10 },
-};
-
-const messageVariants = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -10 },
-};
-
-const dateFormat = (date: number) => {
-  const d = new Date(date);
-  return d.toLocaleString('fr-FR').split(' ')[1];
-};
+console.log(profilPic);
 
 export function SocketTester() {
   const { messages, send } = useChat();
   const nullMsg = messages.length < 1;
-  const { setUser, selectedUser, otherUser } = useUser(tabId, fakeUsers);
+  const { setUser, selectedUser, otherUser } = useUser(tabId);
+  document.title = selectedUser?.username || `user_${tabId}`;
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -50,7 +39,6 @@ export function SocketTester() {
     const msg: Message = {
       id: crypto.randomUUID(),
       content,
-      color: getRandom(colors),
       sentAt: Date.now(),
       user: selectedUser,
     };
@@ -92,9 +80,9 @@ export function SocketTester() {
                 damping: 40,
                 mass: 1.2,
               }}
-              className="flex items-center justify-center gap-2 text-gray-500"
+              className="flex items-center justify-center gap-2"
             >
-              <p className="md:text-xs">
+              <p className="md:text-xs text-gray-500">
                 Start to{' '}
                 {selectedUser ? 'send a message.' : 'select a test user'}
               </p>
@@ -123,7 +111,11 @@ export function SocketTester() {
                 style={{ backgroundColor: `${color}` }}
                 className="p-1 rounded-full size-14 md:size-8 ring-2 ring-blue-500"
               >
-                <img src={logo} alt="Bun" className="size-full" />
+                <img
+                  src={profilPic}
+                  alt={`${profilPic}`}
+                  className="size-full"
+                />
               </div>
               <div className="-space-y-1">
                 <h3 className="p-0 text-lg font-bold md:text-sm">
@@ -133,14 +125,13 @@ export function SocketTester() {
               </div>
 
               <select
-                onChange={(e) => {
-                  setUser(e.target.value);
-                }}
-                className="ml-auto border rounded-full size-6"
+                // onChange={(e) => {
+                //   setUser(e.target.value);
+                // }}
+                className="ml-auto border rounded-full size-6 *:text-black"
               >
-                {fakeUsers.map((u) => (
-                  <option value={u.id}>{u.username}</option>
-                ))}{' '}
+                <option value="">Use AI suggestion</option>
+                <option value="">Not use AI</option>
               </select>
             </motion.div>
           )}
@@ -220,7 +211,9 @@ export function SocketTester() {
                   Pick your test user
                 </option>
                 {fakeUsers.map((u) => (
-                  <option value={u.id}>{u.username}</option>
+                  <option key={u.id} value={u.id}>
+                    {u.username}
+                  </option>
                 ))}
               </select>
               <div className="w-15 shrink-0">

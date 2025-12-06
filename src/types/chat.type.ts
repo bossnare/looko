@@ -6,7 +6,6 @@ export type User = {
 export type Message = {
   id: string;
   content: string;
-  color: string;
   sentAt: number;
   user: User | null;
 };

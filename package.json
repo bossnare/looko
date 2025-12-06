@@ -11,7 +11,11 @@
     "build": "bun run build.ts"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^2.0.53",
+    "@ai-sdk/google": "^2.0.44",
+    "@ai-sdk/openai": "^2.0.77",
     "@phosphor-icons/react": "^2.1.10",
+    "ai": "^5.0.106",
     "bun-plugin-tailwind": "^0.0.14",
     "minimatch": "^10.1.1",
     "motion": "^12.23.24",
